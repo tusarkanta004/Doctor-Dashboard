@@ -86,7 +86,7 @@ const DoctorLoginForm: React.FC = () => {
               <input type="checkbox" className="mr-2 scale-125" />
               Remember me
             </label>
-            <button type="button" className="text-blue-200 hover:underline">
+            <button type="button" className="text-gray-800 hover:underline">
               Forgot Password?
             </button>
           </div>
@@ -98,6 +98,9 @@ const DoctorLoginForm: React.FC = () => {
           >
             🚀 Sign In to Dashboard
           </button>
+           <button type="button" className="text-oklch(27.9% 0.041 260.031) hover:underline" onClick={() => router.push('/register')}>
+              Click here to Create Account
+            </button>
         </form>
       </div>
     </div>
