@@ -204,13 +204,13 @@ export default function HealthcareLanding() {
             <div className="flex flex-col gap-4">
               <button 
                 onClick={() => selectRole('patient')}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-4 px-8 rounded-full text-lg font-semibold transition-all duration-300 hover:from-emerald-600 hover:to-emerald-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/30"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-4 px-8 rounded-full text-lg font-semibold transition-all duration-300 hover:from-emerald-600 hover:to-emerald-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105 focus:outline-2 focus:outline-offset-2 focus:outline-emerald-700 active:bg-emerald-900"
               >
                 🩺 I AM A PATIENT
               </button>
               <button 
                 onClick={() => selectRole('doctor')}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-8 rounded-full text-lg font-semibold transition-all duration-300 hover:from-blue-600 hover:to-blue-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/30"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-8 rounded-full text-lg font-semibold transition-all duration-300 hover:from-blue-600 hover:to-blue-700 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-105 focus:outline-2 focus:outline-offset-2 focus:outline-blue-700 active:bg-blue-900"
               >
                 👨‍⚕️ I AM A DOCTOR
               </button>
