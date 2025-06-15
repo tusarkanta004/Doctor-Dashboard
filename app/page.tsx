@@ -192,7 +192,7 @@ export default function HealthcareLanding() {
             </h1>
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
               Experience the future of healthcare with our comprehensive digital platform. 
-              Connect with doctors, manage appointments, and access your medical records seamlessly.
+              Connect with doctors/patients, manage appointments, and access your medical records seamlessly.
             </p>
           </div>
           

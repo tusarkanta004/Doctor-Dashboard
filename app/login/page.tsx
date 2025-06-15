@@ -26,7 +26,7 @@ const DoctorLoginForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-500">
       <div className="absolute top-4 left-4">
         <button
-          className="text-white bg-white/30 backdrop-blur-sm bg-opacity-20 rounded-full px-4 py-1 text-sm hover:bg-opacity-30 transition hover:bg-violet-600 hover:scale-110  focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700"
+          className="text-white bg-white/30 backdrop-blur-sm bg-opacity-20 rounded-full px-4 py-2 text-sm hover:bg-opacity-30 transition hover:bg-violet-600 hover:scale-105  focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700"
           onClick={() => router.push('/')}
         >
           ← Back to Home
