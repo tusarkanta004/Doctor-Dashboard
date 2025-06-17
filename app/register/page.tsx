@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IDoctor } from '@/models/Doctor';
 
+
 export default function DoctorRegistration() {
   const router = useRouter();
   const [formData, setFormData] = useState<Partial<IDoctor>>({
@@ -24,6 +25,7 @@ export default function DoctorRegistration() {
     'General Surgery',
     'Internal Medicine',
   ];
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -47,7 +49,7 @@ export default function DoctorRegistration() {
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target;
-    
+
     if (name === 'specializations') {
       setFormData(prev => {
         const currentSpecs = prev.specializations || [];
@@ -76,7 +78,7 @@ export default function DoctorRegistration() {
     ];
 
     let filledFields = 0;
-    
+
     requiredFields.forEach(field => {
       if (field === 'specializations') {
         if (formData.specializations && formData.specializations.length > 0) {
@@ -148,34 +150,34 @@ export default function DoctorRegistration() {
 
     if (validateForm()) {
       try {
-        // In a real app, you would send the data to your API endpoint
-        // const response = await fetch('/api/doctors', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     ...formData,
-        //     fullName: `${formData.firstName} ${formData.lastName}`,
-        //   }),
-        // });
+        const response = await fetch('/api/doctors/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            // Ensure password is included (you should add this to your form)
+            password: formData.password || '', // You should add password field to your form
+          }),
+        });
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        setSuccessMessage('✅ Registration submitted successfully! We will review your application and contact you within 24-48 hours.');
-        
-        // In a real app, you might redirect after successful submission
-        // router.push('/doctor-dashboard');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+
+        setSuccessMessage(`✅ Registration submitted successfully! Your doctor ID is ${data.doctorId}. We will review your application and contact you within 24-48 hours.`);
+
       } catch (error) {
         console.error('Error submitting form:', error);
-        setErrors({ ...errors, form: 'An error occurred while submitting the form. Please try again.' });
+        setErrors({ ...errors, form: error instanceof Error ? error.message : 'An error occurred while submitting the form. Please try again.' });
       } finally {
         setIsSubmitting(false);
       }
     } else {
       setIsSubmitting(false);
-      // Scroll to the first error
       const firstError = Object.keys(errors)[0];
       if (firstError) {
         document.getElementById(firstError)?.scrollIntoView({
@@ -196,6 +198,20 @@ export default function DoctorRegistration() {
     router.push('/');
   };
 
+  // Example usage in your React component
+  const checkEmailAvailability = async (email: string) => {
+    const response = await fetch(`/api/doctors/register?email=${encodeURIComponent(email)}`);
+    const data = await response.json();
+    return !data.exists; // returns true if available
+  };
+
+  const checkPhoneAvailability = async (phone: string) => {
+    const response = await fetch(`/api/doctors/register?phone=${encodeURIComponent(phone)}`);
+    const data = await response.json();
+    return !data.exists; // returns true if available
+  };
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center p-8">
       <button
@@ -205,7 +221,7 @@ export default function DoctorRegistration() {
         ← Back to Home
       </button>
       <button
-        onClick={()=>{router.push('/login')}}
+        onClick={() => { router.push('/login') }}
         className="absolute top-20 left-8 bg-white/20 text-white px-4 py-2 rounded-full backdrop-blur-md  transition-all hover:-translate-x-1 hover:bg-violet-600 hover:scale-105  focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700"
       >
         ← Back to Login
@@ -277,7 +293,8 @@ export default function DoctorRegistration() {
                   id="email"
                   name="email"
                   value={formData.email || ''}
-                  onChange={handleChange}
+                  onChange={(e) => {handleChange(e);}}
+                  onBlur={() => checkEmailAvailability(formData.email || '')}
                   className={`w-full p-3 border-2 rounded-lg transition-all ${errors.email ? 'border-red-500' : 'border-gray-200'} focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200`}
                   required
                 />
@@ -293,7 +310,8 @@ export default function DoctorRegistration() {
                   id="phone"
                   name="phone"
                   value={formData.phone || ''}
-                  onChange={handleChange}
+                  onChange={(e) => {handleChange(e);}}
+                  onBlur={() => checkPhoneAvailability(formData.phone || '')}
                   className={`w-full p-3 border-2 rounded-lg transition-all ${errors.phone ? 'border-red-500' : 'border-gray-200'} focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200`}
                   required
                 />
