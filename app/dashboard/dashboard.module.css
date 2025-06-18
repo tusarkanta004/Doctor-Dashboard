@@ -85,6 +85,21 @@
   gap: 20px;
   padding: 0 10px;
   background: linear-gradient(to right, #e3f2fd 50%, #fefefe 50%);
+  align-items: stretch;
+  min-height: calc(100vh - 160px);
+  height: auto;
+}
+.left-panel, 
+.right-panel {
+  flex: 1;
+  min-height: 600px; /* Set minimum height */
+  height: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 160px);
+}
+.left-panel {
+  min-height: 100vh; /* or a larger value like 120vh */
+  height: auto;
 }
 
 /* LEFT PANEL */
@@ -331,10 +346,11 @@ button.send:hover {
 }
 .section-left {
   display: flex;
-  flex: 1;
   gap: 20px;
-  min-width: 600px;
+  flex: 1;
+  height: 100%;
 }
+
 
 /* Patient List Panel */
 .patient-list {

@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const initialPatients = [
@@ -14,6 +15,19 @@ export default function Dashboard() {
   const [selectedPatient, setSelectedPatient] = useState(initialPatients[0]);
   const [medications, setMedications] = useState([{ name: '', strength: '' }]);
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !(dropdownRef.current as any).contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const addMedication = () => {
     setMedications([...medications, { name: '', strength: '' }]);
   };
@@ -30,23 +44,41 @@ export default function Dashboard() {
           />
           <h1 className="text-xl font-bold text-blue-900">N6T TECHNOLOGY Doctor Dashboard</h1>
         </div>
-        <div className="flex items-center gap-4">
-          <div>
-            <p className="font-semibold text-slate-900">Dr. Sarah Wilson</p>
-            <p className="text-sm text-slate-500">Internal Medicine</p>
+        <div className="relative" ref={dropdownRef}>
+          <div
+            className="flex items-center gap-4 cursor-pointer"
+            onClick={() => setDropdownOpen((prev) => !prev)}
+          >
+            <div>
+              <p className="font-semibold text-slate-900">Dr. Sarah Wilson</p>
+              <p className="text-sm text-slate-500">Internal Medicine</p>
+            </div>
+            <div className="bg-blue-500 text-white font-semibold h-10 w-10 rounded-full flex items-center justify-center">
+              SW
+            </div>
           </div>
-          <div className="bg-blue-500 text-white font-semibold h-10 w-10 rounded-full flex items-center justify-center">
-            SW
-          </div>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
+              <ul className="py-2 text-sm text-slate-700">
+                <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">View Profile</li>
+                <li className="px-4 py-2 hover:bg-blue-50 cursor-pointer">Change Password</li>
+                <li
+                  className="px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer"
+                  onClick={() => router.push('/login')}
+                >
+                  Logout
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Main Content */}
       <main>
-        <section className="flex flex-col lg:flex-row gap-5">
-          {/* Patient List Panel */}
-          <div className="bg-white p-5 rounded-xl shadow-md w-full lg:w-64 h-fit max-h-[calc(100vh-160px)] overflow-y-auto">
-            <h3 className="text-lg font-bold text-blue-900 mb-4 text-center">Patients</h3>
+        <section className="flex gap-5 h-[calc(100vh-160px)] overflow-hidden">          {/* Patient List Panel */}
+          <div className="bg-white p-5 rounded-xl shadow-md w-64 h-full overflow-y-auto">            <h3 className="text-lg font-bold text-blue-900 mb-4 text-center">Patients</h3>
             <input
               type="text"
               placeholder="Search patients..."
@@ -64,11 +96,10 @@ export default function Dashboard() {
                   <li
                     key={patient.id}
                     onClick={() => setSelectedPatient(patient)}
-                    className={`p-3 rounded-lg mb-2 cursor-pointer transition-all ${
-                      patient.name === selectedPatient.name
-                        ? 'bg-blue-500 text-white font-semibold'
-                        : 'bg-slate-100 hover:bg-blue-100'
-                    }`}
+                    className={`p-3 rounded-lg mb-2 cursor-pointer transition-all ${patient.name === selectedPatient.name
+                      ? 'bg-blue-500 text-white font-semibold'
+                      : 'bg-slate-100 hover:bg-blue-100'
+                      }`}
                   >
                     {patient.name}
                   </li>
@@ -77,7 +108,7 @@ export default function Dashboard() {
           </div>
 
           {/* Left Panel */}
-          <div className="bg-white p-6 rounded-xl shadow-md flex-1 max-h-[calc(100vh-160px)] overflow-y-auto">
+          <div className="bg-white p-6 rounded-xl shadow-md flex-1 h-full overflow-y-auto">
             <h2 className="text-2xl font-bold text-blue-900 mb-6 text-center tracking-wide">
               Patient Details
             </h2>
@@ -149,9 +180,9 @@ export default function Dashboard() {
           </div>
 
           {/* Right Panel */}
-          <div className="bg-white p-6 rounded-xl shadow-md w-full lg:w-96">
+          <div className="bg-white p-6 rounded-xl shadow-md w-96 h-full overflow-y-auto">
             <h2 className="text-2xl font-extrabold text-slate-900 mb-5 text-center tracking-wide uppercase">
-             Generate Prescription
+              Generate Prescription
             </h2>
             <textarea
               rows={2}
