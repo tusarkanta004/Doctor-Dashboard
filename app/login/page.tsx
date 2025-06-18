@@ -12,39 +12,38 @@ const DoctorLoginForm: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-
-
     // API authentication will be done here
-
-
-
     console.log('Logging in:', { email, password });
     router.push('/dashboard');
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-500">
+      {/* Back Button */}
       <div className="absolute top-4 left-4">
         <button
-          className="text-white bg-white/30 backdrop-blur-sm bg-opacity-20 rounded-full px-4 py-2 text-sm hover:bg-opacity-30 transition hover:bg-violet-600 hover:scale-105  focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700"
+          className="text-white bg-white/30 backdrop-blur-sm bg-opacity-20 rounded-full px-4 py-2 text-sm hover:bg-opacity-30 transition hover:bg-violet-600 hover:scale-105 focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700"
           onClick={() => router.push('/')}
         >
           ← Back to Home
         </button>
       </div>
 
-      <div className="bg-white/30 backdrop-blur-sm rounded-xl p-8 shadow-lg w-full max-w-md">
+      {/* Login Form Box */}
+      <div className="bg-gradient-to-br from-white via-blue-100 to-blue-200 rounded-xl p-8 shadow-xl w-full max-w-md">
+        {/* Header */}
         <div className="flex flex-col items-center mb-6">
           <div className="text-5xl">🧑‍⚕️</div>
-          <h2 className="text-white text-2xl font-bold mt-4">Doctor Login</h2>
-          <p className="text-indigo-100 mt-1 text-sm">Access your healthcare dashboard</p>
+          <h2 className="text-slate-900 text-2xl font-bold mt-4">Doctor Login</h2>
+          <p className="text-slate-600 mt-1 text-sm">Access your healthcare dashboard</p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleLogin} className="space-y-5">
-          {/* Email */}
+          {/* Email Field */}
           <div>
-            <label className="text-white text-sm mb-1 block">Email Address</label>
-            <div className="flex items-center bg-white/30 backdrop-blur-sm rounded-lg p-2">
+            <label className="text-gray-800 text-sm mb-1 block">Email Address</label>
+            <div className="flex items-center bg-white rounded-lg p-2 shadow-sm">
               <span className="mr-2 text-xl">📧</span>
               <input
                 type="email"
@@ -52,15 +51,15 @@ const DoctorLoginForm: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-transparent outline-none w-full text-black text-2xl placeholder-zinc-500"
+                className="bg-transparent outline-none w-full text-gray-800 text-base placeholder-gray-400"
               />
             </div>
           </div>
 
-          {/* Password */}
+          {/* Password Field */}
           <div>
-            <label className="text-white text-sm mb-1 block">Password</label>
-            <div className="flex items-center bg-white/30 backdrop-blur-sm rounded-lg p-2">
+            <label className="text-gray-800 text-sm mb-1 block">Password</label>
+            <div className="flex items-center bg-white rounded-lg p-2 shadow-sm">
               <span className="mr-2 text-xl">🔒</span>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -68,7 +67,7 @@ const DoctorLoginForm: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-transparent outline-none w-full text-black text-2xl placeholder-zinc-500"
+                className="bg-transparent outline-none w-full text-gray-800 text-base placeholder-gray-400"
               />
               <button
                 type="button"
@@ -80,13 +79,13 @@ const DoctorLoginForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Remember Me and Forgot Password */}
-          <div className="flex justify-between items-center text-white text-sm">
-            <label className="flex items-center text-xl">
+          {/* Remember Me & Forgot Password */}
+          <div className="flex justify-between items-center text-gray-700 text-sm">
+            <label className="flex items-center">
               <input type="checkbox" className="mr-2 scale-125" />
               Remember me
             </label>
-            <button type="button" className="text-gray-800 hover:underline">
+            <button type="button" className="text-blue-700 hover:underline">
               Forgot Password?
             </button>
           </div>
@@ -94,13 +93,21 @@ const DoctorLoginForm: React.FC = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition flex justify-center items-center"
+            className="w-full py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold hover:from-blue-600 hover:to-blue-800 shadow-md transition-all"
           >
             🚀 Sign In to Dashboard
           </button>
-           <button type="button" className="text-oklch(27.9% 0.041 260.031) hover:underline" onClick={() => router.push('/register')}>
+
+          {/* Create Account Link */}
+          <div className="text-center mt-4">
+            <button
+              type="button"
+              className="text-blue-700 hover:underline"
+              onClick={() => router.push('/register')}
+            >
               Click here to Create Account
             </button>
+          </div>
         </form>
       </div>
     </div>
