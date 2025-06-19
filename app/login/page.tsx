@@ -22,8 +22,8 @@ const DoctorLoginForm: React.FC = () => {
 
     if (result?.error) {
       console.error("Login error:", result.error);
-      router.push("/dashboard");
     } else {
+      router.push("/dashboard");
     }
   };
 
