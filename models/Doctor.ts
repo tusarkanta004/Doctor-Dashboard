@@ -156,6 +156,7 @@ const doctorSchema = new Schema<IDoctor>(
         doctorId:{
             type:String,
             unique:true,
+            required: true,
         }
 
     },
@@ -171,12 +172,35 @@ const counterSchema = new Schema<ICounter>({
 });
 
 
-doctorSchema.pre('save',async function(next){
-    if(this.isModified('password')){
-        this.password = await bcrypt.hash(this.password,10);
+doctorSchema.pre('save', async function (next) {
+  try {
+    // Hash password if modified
+    if (this.isModified('password')) {
+      this.password = await bcrypt.hash(this.password, 10);
     }
+
+    // Set full name
+    this.fullName = `Dr.${this.firstName} ${this.lastName}`;
+
+    // Generate doctorId if new
+    if (this.isNew) {
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: 'doctorId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+
+      if (counter) {
+        this.doctorId = `DOC-${counter.seq.toString().padStart(4, '0')}`;
+      }
+    }
+
     next();
-})
+  } catch (err) {
+    next(err as Error);
+  }
+});
+
 
 doctorSchema.pre('save', function (next) {
   this.fullName = `Dr.${this.firstName} ${this.lastName}`;

@@ -1,28 +1,45 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { IPatient } from '@/models/Patient';
 
-
 export default function Dashboard() {
-  const { data: session } = useSession();
-  console.log('Session:', session);
-
+  const [doctor, setDoctor] = useState<any>(null);
   const [patients, setPatients] = useState<IPatient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Load doctor from localStorage
   useEffect(() => {
-    const fetchPatients = async () => {
-      if (session?.user?.id) {
-        const res = await fetch(`/api/patients?doctorId=${session.user.id}`);
-        const data = await res.json();
-        setPatients(data);
-      }
-    };
+    const storedDoctor = localStorage.getItem('doctor');
+    if (storedDoctor) {
+      const parsedDoctor = JSON.parse(storedDoctor);
+      console.log("Loaded doctor:", parsedDoctor);
+      setDoctor(parsedDoctor);
+    }
+  }, []);
 
-    fetchPatients();
-  }, [session]);
+  // Fetch patients based on doctor ID
+  useEffect(() => {
+  const fetchPatients = async () => {
+    if (doctor?._id) {
+      console.log("🔍 Fetching patients for doctor:", doctor._id);
+      const res = await fetch(`/api/patients?doctorId=${doctor._id}`);
+      const data = await res.json();
+      console.log("📋 Patients fetched:", data);
+      setPatients(data);
+    }
+  };
+
+  fetchPatients();
+}, [doctor?._id]);
+
+
+  console.log("👨‍⚕️ Doctor ID:", doctor?._id);
+  useEffect(() => {
+  console.log("🧑‍⚕️ Doctor loaded:", doctor);
+  console.log("🧾 Patients:", patients);
+}, [doctor, patients]);
 
   return (
     <div className="p-5">
@@ -38,8 +55,12 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-4">
           <div>
-            <p className="font-semibold text-slate-900">Dr. {session?.user?.name}</p>
-            <p className="text-sm text-slate-500">Your Speciality</p>
+            <p className="font-semibold text-slate-900">
+              Dr. {doctor?.firstName} {doctor?.lastName}
+            </p>
+            <p className="text-sm text-slate-500">
+              {doctor?.specializations?.join(', ') || 'Your Speciality'}
+            </p>
           </div>
         </div>
       </div>
@@ -57,23 +78,22 @@ export default function Dashboard() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-
-           <ul className="list-none p-0 m-0">
-  {patients
-    .filter((patient) =>
-      patient.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .map((patient) => (
-      <li key={patient._id as string}>
-        <Link
-          href={`/dashboard/patients/${patient._id as string}`}
-          className="block p-3 rounded-lg mb-2 bg-slate-100 hover:bg-blue-100 transition"
-        >
-          {patient.name}
-        </Link>
-      </li>
-    ))}
-</ul>
+            <ul className="list-none p-0 m-0">
+              {patients
+                .filter((patient) =>
+                  patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((patient) => (
+                  <li key={patient._id as string}>
+                    <Link
+                      href={`/dashboard/patients/${patient._id as string}`}
+                      className="block p-3 rounded-lg mb-2 bg-slate-100 hover:bg-blue-100 transition"
+                    >
+                      {patient.name}
+                    </Link>
+                  </li>
+                ))}
+            </ul>
           </div>
 
           {/* Right Panel */}

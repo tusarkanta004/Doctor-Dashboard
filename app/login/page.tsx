@@ -2,28 +2,37 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 
 const DoctorLoginForm: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password
+
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     });
 
-    console.log("Sign in result:", result);
+    const data = await res.json();
 
-    if (result?.error) {
-      console.error("Login error:", result.error);
+    if (res.ok) {
+      console.log('✅ Login successful', data.doctor);
+
+      // Save doctor profile to localStorage
+      localStorage.setItem('doctor', JSON.stringify(data.doctor));
+
+      router.push('/dashboard');
     } else {
-      router.push("/dashboard");
+      console.error('❌ Login failed:', data.error);
+      setError(data.error || 'Invalid credentials');
     }
   };
 
@@ -47,6 +56,13 @@ const DoctorLoginForm: React.FC = () => {
           <h2 className="text-slate-900 text-2xl font-bold mt-4">Doctor Login</h2>
           <p className="text-slate-600 mt-1 text-sm">Access your healthcare dashboard</p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 text-red-700 border border-red-300 p-2 rounded text-sm mb-4 text-center">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleLogin} className="space-y-5">

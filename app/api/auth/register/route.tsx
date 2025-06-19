@@ -6,92 +6,64 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
   try {
     await connectToDatabase();
+    console.log("✅ Connected to MongoDB");
 
     const formData = await request.json();
+    console.log("📥 Received form data:", formData);
 
-    const existingEmail = await Doctor.findOne({ email: formData.email });
+    // ✅ Validate required fields
+    const requiredFields = [
+      'email', 'phone', 'password', 'licenseNumber', 'firstName', 'lastName'
+    ];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        return NextResponse.json({ error: `${field} is required` }, { status: 400 });
+      }
+    }
+
+    // ✅ Check if email, phone, or license already exists
+    const [existingEmail, existingPhone, existingLicense] = await Promise.all([
+      Doctor.findOne({ email: formData.email }),
+      Doctor.findOne({ phone: formData.phone }),
+      Doctor.findOne({ licenseNumber: formData.licenseNumber }),
+    ]);
+
     if (existingEmail) {
-      return NextResponse.json(
-        { error: 'Email already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
     }
-
-    // Check if phone number already exists
-    const existingPhone = await Doctor.findOne({ phone: formData.phone });
     if (existingPhone) {
-      return NextResponse.json(
-        { error: 'Phone number already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Phone number already exists' }, { status: 400 });
     }
-
-    // Check if license number already exists
-    const existingLicense = await Doctor.findOne({ licenseNumber: formData.licenseNumber });
     if (existingLicense) {
-      return NextResponse.json(
-        { error: 'License number already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'License number already exists' }, { status: 400 });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(formData.password, 10);
+    // ✅ Hash password
+    //const hashedPassword = await bcrypt.hash(formData.password, 10);
 
-    // Create new doctor with hashed password
+    // ✅ Create new Doctor instance
     const newDoctor = new Doctor({
       ...formData,
-      password: hashedPassword,
-      fullName: `Dr.${formData.firstName} ${formData.lastName}`
+      //password: hashedPassword,
+fullName: formData.firstName && formData.lastName 
+  ? `Dr.${formData.firstName} ${formData.lastName}` 
+  : formData.firstName || formData.lastName || "Doctor"
     });
 
-    // Save to database
-    await newDoctor.save();
+    // ✅ Save to DB
+    const savedDoctor = await newDoctor.save();
+    console.log("🎉 Doctor registered:", savedDoctor.email);
 
-    return NextResponse.json(
-      { 
-        message: 'Doctor registered successfully!',
-        doctorId: newDoctor.doctorId 
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      message: "Doctor registered successfully",
+      doctorId: savedDoctor.doctorId,
+    }, { status: 201 });
 
   } catch (error: any) {
-    console.error('Registration error:', error);
-    return NextResponse.json(
-      { error: 'Server error', details: error.message },
-      { status: 500 }
-    );
-  }
-}
-
-// Optional: GET request handler to check if email/phone exists
-export async function GET(request: Request) {
-  try {
-    await connectToDatabase();
-    const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email');
-    const phone = searchParams.get('phone');
-
-    if (email) {
-      const exists = await Doctor.findOne({ email });
-      return NextResponse.json({ exists: !!exists });
-    }
-
-    if (phone) {
-      const exists = await Doctor.findOne({ phone });
-      return NextResponse.json({ exists: !!exists });
-    }
-
-    return NextResponse.json(
-      { error: 'No email or phone provided' },
-      { status: 400 }
-    );
-  } catch (error) {
-    console.error('Error checking existence:', error);
-    return NextResponse.json(
-      { error: 'Server error' },
-      { status: 500 }
-    );
+    console.error("❌ Registration error:", error.message);
+    return NextResponse.json({
+      error: 'Server error',
+      details: error.message
+    }, { status: 500 });
   }
 }
