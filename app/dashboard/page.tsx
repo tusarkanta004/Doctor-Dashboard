@@ -161,14 +161,27 @@ export default function Dashboard() {
                   <p>{selectedPatient.allergies.length ? selectedPatient.allergies.join(', ') : 'None'}</p>
                 </div>
 
-                <div className="bg-blue-50 p-4 rounded shadow-sm">
-                  <h3 className="text-lg font-bold text-blue-800 mb-2">💓 Vital Signs</h3>
-                  <p><strong>Blood Pressure:</strong> {selectedPatient.vitalSigns.bloodPressure}</p>
-                  <p><strong>Pulse:</strong> {selectedPatient.vitalSigns.pulse} bpm</p>
-                  <p><strong>Temperature:</strong> {selectedPatient.vitalSigns.temperature}</p>
-                  <p><strong>Weight:</strong> {selectedPatient.vitalSigns.weight}</p>
+                {/* Vital Signs Section */}
+                <div className="bg-blue-100 p-4 rounded-xl shadow-sm">
+                  <h3 className="text-lg font-bold text-blue-900 mb-4"> 💓 Latest Vital Signs</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <span className="font-semibold">BP:</span> {selectedPatient.vitalSigns?.bloodPressure || 'N/A'}
+                    </div>
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <span className="font-semibold">Heart Rate:</span> {selectedPatient.vitalSigns?.pulse || 'N/A'} bpm
+                    </div>
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <span className="font-semibold">Temperature:</span> {selectedPatient.vitalSigns?.temperature || 'N/A'}
+                    </div>
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <span className="font-semibold">Weight:</span> {selectedPatient.vitalSigns?.weight || 'N/A'}
+                    </div>
+                  </div>
                 </div>
+
               </div>
+
             ) : (
               <div className="text-center py-24">
                 <h2 className="text-2xl font-bold text-blue-900 mb-4">
