@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const DoctorLoginForm: React.FC = () => {
   const router = useRouter();
@@ -9,12 +10,21 @@ const DoctorLoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password
+    });
 
-    // API authentication will be done here
-    console.log('Logging in:', { email, password });
-    router.push('/dashboard');
+    console.log("Sign in result:", result);
+
+    if (result?.error) {
+      console.error("Login error:", result.error);
+      router.push("/dashboard");
+    } else {
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Schema, model, models, Model, Document } from 'mongoose';
+import { Schema, model, models, Model, Document, Types} from 'mongoose';
 
 export interface IVitalSigns {
   bloodPressure: string;
@@ -22,7 +22,10 @@ export interface IPatient extends Document {
   name: string;
   age: number;
   gender: string;
+  bloodGroup:String;
   phone: string;
+  email:String;
+  address:String;
   lastVisit: Date;
   diagnosis: {
     primary: string;
@@ -31,6 +34,8 @@ export interface IPatient extends Document {
   vitalSigns: IVitalSigns;
   medicalHistory: IMedicalHistoryEntry[];
   medications: IMedication[];
+  allergies:string[];
+  doctor: Types.ObjectId;
   createdAt?: Date;
   updatedAt?:Date;
 }
@@ -43,8 +48,8 @@ const vitalSignsSchema = new Schema<IVitalSigns>({
 });
 
 const medicalHistoryEntrySchema = new Schema<IMedicalHistoryEntry>({
+  notes: { type: String, required: true },
   year: { type: Number, required: true },
-  notes: { type: String, required: true }
 });
 
 const medicationSchema = new Schema<IMedication>({
@@ -57,15 +62,20 @@ const patientSchema = new Schema<IPatient>({
   name: { type: String, required: true },
   age: { type: Number, required: true },
   gender: { type: String,enum:["Male","Female","Other"], required: true },
+  bloodGroup:{type:String,required:true},
   phone: { type: String, required: true },
+  email: { type: String, required: true },
+  address:{type:String,required:true},
   lastVisit: { type: Date, required: true },
   diagnosis: {
     primary: { type: String, required: true },
     status: { type: String, required: true }
   },
+  allergies:{type:[String],default:null},
   vitalSigns: { type: vitalSignsSchema, required: true },
   medicalHistory: { type: [medicalHistoryEntrySchema], required: true },
   medications: { type: [medicationSchema], required: true },
+  doctor: { type: Schema.Types.ObjectId, ref: 'Doctor', required: true },
 },{timestamps:true});
 
 export const Patient: Model<IPatient> = models.Patient || model<IPatient>('Patient', patientSchema);

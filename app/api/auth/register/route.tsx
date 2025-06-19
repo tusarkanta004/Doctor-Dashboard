@@ -36,14 +36,13 @@ export async function POST(request: Request) {
     }
 
     // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(formData.password, salt);
+    const hashedPassword = await bcrypt.hash(formData.password, 10);
 
     // Create new doctor with hashed password
     const newDoctor = new Doctor({
       ...formData,
       password: hashedPassword,
-      fullName: `${formData.firstName} ${formData.lastName}`
+      fullName: `Dr.${formData.firstName} ${formData.lastName}`
     });
 
     // Save to database

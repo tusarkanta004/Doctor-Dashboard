@@ -179,7 +179,7 @@ doctorSchema.pre('save',async function(next){
 })
 
 doctorSchema.pre('save', function (next) {
-  this.fullName = `${this.firstName} ${this.lastName}`;
+  this.fullName = `Dr.${this.firstName} ${this.lastName}`;
   next();
 });
 
