@@ -13,6 +13,9 @@ export default function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
+
 
   // Prescription form state
   const [condition, setCondition] = useState('');
@@ -71,6 +74,42 @@ export default function Dashboard() {
     console.log('Prescription Payload:', payload);
     alert('Prescription submitted!');
   };
+
+  const handleGenerateSuggestion = async () => {
+    console.log("💡 AI Suggestion button clicked");
+    setLoadingSuggestion(true);
+
+    try {
+      const res = await fetch('/api/ai-suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientData: {
+            name: "Test Patient",
+            age: 35,
+            gender: "Male",
+            symptoms: ["Fever", "Headache"]
+          }
+        })
+      });
+
+      const data = await res.json();
+      console.log("📦 AI Suggestion response:", data);
+
+      if (data.suggestion) {
+        setAiSuggestion(JSON.parse(data.suggestion));
+      } else {
+        alert("No AI suggestion received.");
+      }
+
+    } catch (err) {
+      console.error("❌ Error fetching AI suggestion:", err);
+      alert("Failed to fetch AI suggestion.");
+    } finally {
+      setLoadingSuggestion(false);
+    }
+  };
+
 
   return (
     <div className="p-5 min-h-screen">
@@ -335,14 +374,36 @@ export default function Dashboard() {
               </button>
 
               <button
-                onClick={() => {
-                  // Placeholder for AI suggestion logic
-                  alert('🔍 AI Suggestion generated based on condition');
-                }}
+                onClick={handleGenerateSuggestion}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold"
               >
-                💡 Generate AI Suggestion
+                {loadingSuggestion ? 'Generating...' : '💡 Generate AI Suggestion'}
               </button>
+
+              {aiSuggestion && (
+                <div className="mt-6 p-4 bg-slate-100 rounded border border-slate-200">
+                  <h2 className="text-lg font-bold mb-2">💊 AI Suggested Prescription:</h2>
+
+                  <div className="mb-2">
+                    <strong>Symptoms:</strong> {aiSuggestion.symptoms}
+                  </div>
+                  <div className="mb-2">
+                    <strong>Diagnosis:</strong> {aiSuggestion.diagnosis}
+                  </div>
+                  <div>
+                    <strong>Medications:</strong>
+                    <ul className="list-disc ml-6 mt-1">
+                      {aiSuggestion.medications.map((med: any, index: number) => (
+                        <li key={index}>
+                          {med.name} - {med.dosage} ({med.instructions})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+
             </div>
           </div>
 

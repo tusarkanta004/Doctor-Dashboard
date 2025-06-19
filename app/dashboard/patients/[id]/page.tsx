@@ -55,7 +55,7 @@ export default function PatientDetailsPage() {
     setLoadingSuggestion(true);
 
     try {
-      const res = await fetch('/app/api/ai-suggest', {
+      const res = await fetch('/api/ai-suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ patientData: patient })
