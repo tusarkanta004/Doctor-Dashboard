@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Prescription form state
   const [condition, setCondition] = useState('');
@@ -100,27 +101,27 @@ export default function Dashboard() {
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg w-48 z-10">
               <ul className="text-sm text-gray-700">
-                <li
-                  onClick={() => {
-                    setDropdownOpen(false);
-                    router.push('/profile');
-                  }}
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
-                >
-                  Profile
+                <li>
+                  <button
+                    onClick={() => setShowProfileModal(true)}
+                    className="block px-4 py-2 hover:bg-blue-100 w-full text-left"
+                  >
+                    👤 Profile
+                  </button>
                 </li>
+
                 <li
                   onClick={() => {
                     setDropdownOpen(false);
                     router.push('/change-password');
                   }}
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-left"
                 >
                   Change Password
                 </li>
                 <li
                   onClick={handleLogout}
-                  className="px-4 py-2 hover:bg-red-100 text-red-600 font-medium cursor-pointer"
+                  className="px-4 py-2 hover:bg-red-100 text-red-600 font-medium cursor-pointer text-left"
                 >
                   Logout
                 </li>
@@ -347,6 +348,53 @@ export default function Dashboard() {
 
         </section>
       </main>
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white w-[90%] max-w-3xl p-6 rounded-xl relative shadow-lg overflow-y-auto max-h-[90vh]">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="absolute top-3 right-4 text-gray-500 hover:text-red-500 text-xl"
+            >
+              &times;
+            </button>
+
+            {/* Doctor Info */}
+            <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
+              <div className="w-24 h-24 rounded-full bg-blue-100 border-4 border-blue-300 flex items-center justify-center text-3xl font-bold text-blue-800 uppercase">
+                {doctor?.firstName?.charAt(0)}{doctor?.lastName?.charAt(0)}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-blue-900">
+                  Dr. {doctor?.firstName} {doctor?.lastName}
+                </h2>
+                <p className="text-gray-600">{doctor?.specializations?.join(', ')}</p>
+                <p className="text-sm text-blue-800 mt-1">{doctor?.bio}</p>
+              </div>
+            </div>
+
+            {/* Doctor Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+              <p><strong>Email:</strong> {doctor?.email}</p>
+              <p><strong>Phone:</strong> {doctor?.phone}</p>
+              <p><strong>Gender:</strong> {doctor?.gender}</p>
+              <p><strong>Date of Birth:</strong> {doctor?.dateOfBirth?.substring(0, 10)}</p>
+              <p><strong>Experience:</strong> {doctor?.experience} years</p>
+              <p><strong>License No:</strong> {doctor?.licenseNumber}</p>
+              <p><strong>Graduation:</strong> {doctor?.medicalSchool} ({doctor?.graduationYear})</p>
+              <p><strong>Clinic:</strong> {doctor?.clinicName}</p>
+              <p><strong>Address:</strong> {doctor?.practiceAddress}, {doctor?.city}, {doctor?.state} - {doctor?.zipCode}</p>
+              <p><strong>Consultation Fee:</strong> ₹{doctor?.consultationFee}</p>
+              <p><strong>License Document:</strong>{' '}
+                <a href={doctor?.medicalLicenseDocument} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                  View PDF
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
