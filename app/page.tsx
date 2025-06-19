@@ -257,9 +257,55 @@ export default function HealthcareLanding() {
       </section>
 
       <section id="contact" className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">Contact Us</h2>
-          <p className="text-xl text-gray-600">Get in touch with our healthcare specialists.</p>
+        <div className="max-w-6xl mx-auto px-8">
+          <h2 className="text-5xl font-bold text-center text-gray-900 mb-12">
+            Contact Us
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Phone */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group animate-fade-in-up">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                📞
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Phone</h3>
+              <p className="text-gray-600 leading-relaxed">+91 8908329226</p>
+            </div>
+
+            {/* Email */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group animate-fade-in-up" style={{ animationDelay: `100ms` }}>
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                📧
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Email</h3>
+              <a href="team@n6t.in" className="text-gray-600 leading-relaxed">team@n6t.in </a>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@teamclinqow@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer" className="text-gray-600 leading-relaxed">teamclinqow@gmail.com</a>
+            </div>
+
+            {/* Website */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group animate-fade-in-up" style={{ animationDelay: `200ms` }}>
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                🌐
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Website</h3>
+              <a href="https://www.n6thealth.com" target="_blank" className="text-blue-600 hover:underline">www.n6t.in</a>
+            </div>
+
+            {/* Address */}
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group animate-fade-in-up" style={{ animationDelay: `300ms` }}>
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                📍
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Address</h3>
+              <p className="text-gray-600 leading-relaxed">
+                N6T Tech Park,<br />
+                Sector-5, Bangalore,<br />
+                India
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
