@@ -1,14 +1,17 @@
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { IPatient } from '@/models/Patient';
 
 export default function Dashboard() {
+  const router = useRouter();
   const [doctor, setDoctor] = useState<any>(null);
   const [patients, setPatients] = useState<IPatient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<IPatient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Prescription form state
   const [condition, setCondition] = useState('');
@@ -31,6 +34,21 @@ export default function Dashboard() {
         .catch((err) => console.error('Failed to fetch patients', err));
     }
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('doctor');
+    router.push('/login');
+  };
 
   const handlePatientClick = (patient: IPatient) => {
     setSelectedPatient(patient);
@@ -56,7 +74,7 @@ export default function Dashboard() {
   return (
     <div className="p-5 min-h-screen">
       {/* Header */}
-      <div className="bg-white mb-6 p-5 rounded-2xl flex justify-between items-center shadow">
+      <div className="bg-white mb-6 p-5 rounded-2xl flex justify-between items-center shadow relative">
         <div className="flex items-center gap-4">
           <img
             src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
@@ -65,13 +83,53 @@ export default function Dashboard() {
           />
           <h1 className="text-xl font-bold text-blue-900">Doctor Dashboard</h1>
         </div>
-        <div className="text-right">
+
+        {/* Dropdown Trigger moved to Doctor Name */}
+        <div
+          className="text-right cursor-pointer relative"
+          ref={dropdownRef}
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
           <p className="font-semibold text-slate-900">
             Dr. {doctor?.firstName} {doctor?.lastName}
           </p>
-          <p className="text-sm text-slate-500">{doctor?.specializations?.join(', ') || 'Specialist'}</p>
+          <p className="text-sm text-slate-500">
+            {doctor?.specializations?.join(', ') || 'Specialist'}
+          </p>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-lg w-48 z-10">
+              <ul className="text-sm text-gray-700">
+                <li
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    router.push('/profile');
+                  }}
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                >
+                  Profile
+                </li>
+                <li
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    router.push('/change-password');
+                  }}
+                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer"
+                >
+                  Change Password
+                </li>
+                <li
+                  onClick={handleLogout}
+                  className="px-4 py-2 hover:bg-red-100 text-red-600 font-medium cursor-pointer"
+                >
+                  Logout
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
+
 
       {/* Main Content */}
       <main>
@@ -93,7 +151,9 @@ export default function Dashboard() {
                   <li key={p._id}>
                     <button
                       onClick={() => handlePatientClick(p)}
-                      className={`block w-full text-left p-3 rounded-lg mb-2 ${selectedPatient?._id === p._id ? 'bg-blue-100 font-semibold' : 'bg-slate-100'
+                      className={`block w-full text-left p-3 rounded-lg mb-2 ${selectedPatient?._id === p._id
+                        ? 'bg-blue-100 font-semibold'
+                        : 'bg-slate-100'
                         } hover:bg-blue-100 transition`}
                     >
                       {p.name}
@@ -135,6 +195,7 @@ export default function Dashboard() {
                     )}
                   </ul>
                 </div>
+
                 <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
                   <h3 className="text-lg font-bold text-blue-800 mb-2">🩺 Diagnosis / Symptoms</h3>
                   <p><strong>Primary:</strong> {selectedPatient.diagnosis?.primary || 'N/A'}</p>
@@ -179,9 +240,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-
               </div>
-
             ) : (
               <div className="text-center py-24">
                 <h2 className="text-2xl font-bold text-blue-900 mb-4">
