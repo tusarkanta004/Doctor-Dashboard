@@ -1,19 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/utils/db';
 import { Patient } from '@/models/Patient';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface Context {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(request: Request, { params }: Context) {
   await connectToDatabase();
 
-  const { id } = params; // Destructure directly from params
-
   try {
-    const patient = await Patient.findById(id);
+    const patient = await Patient.findById(params.id);
     if (!patient) {
-      return NextResponse.json({ message: 'Patient not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: 'Patient not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(patient);
