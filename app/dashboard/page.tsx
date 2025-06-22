@@ -2,20 +2,55 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { IPatient } from '@/models/Patient';
+
+interface IDoctor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  gender?: string;
+  dateOfBirth?: string;
+  specializations?: string[];
+  bio?: string;
+  experience?: number;
+  licenseNumber: string;
+  medicalSchool?: string;
+  graduationYear?: number;
+  clinicName?: string;
+  practiceAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  consultationFee?: number;
+  medicalLicenseDocument?: string;
+}
+
+interface IMedication {
+  name: string;
+  dosage: string;
+  instructions: string;
+}
+
+interface IAiSuggestion {
+  symptoms: string;
+  diagnosis: string;
+  medications: IMedication[];
+}
 
 export default function Dashboard() {
   const router = useRouter();
-  const [doctor, setDoctor] = useState<any>(null);
+  const [doctor, setDoctor] = useState<IDoctor | null>(null);
   const [patients, setPatients] = useState<IPatient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<IPatient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<IAiSuggestion | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
-
 
   // Prescription form state
   const [condition, setCondition] = useState('');
@@ -97,8 +132,14 @@ export default function Dashboard() {
       console.log("📦 AI Suggestion response:", data);
 
       if (data.suggestion) {
-        setAiSuggestion(JSON.parse(data.suggestion));
-      } else {
+  const parsedSuggestion =
+    typeof data.suggestion === 'string'
+      ? JSON.parse(data.suggestion)
+      : data.suggestion;
+
+  setAiSuggestion(parsedSuggestion);
+}
+ else {
         alert("No AI suggestion received.");
       }
 
