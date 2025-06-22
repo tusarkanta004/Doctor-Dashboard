@@ -157,9 +157,11 @@ export default function Dashboard() {
       {/* Header */}
       <div className="bg-white mb-6 p-5 rounded-2xl flex justify-between items-center shadow relative">
         <div className="flex items-center gap-4">
-          <img
+          <Image
             src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
             alt="Doctor Logo"
+            width={48}
+            height={48}
             className="h-12 w-12 rounded-xl"
           />
           <h1 className="text-xl font-bold text-blue-900">Doctor Dashboard</h1>
@@ -434,7 +436,7 @@ export default function Dashboard() {
                   <div>
                     <strong>Medications:</strong>
                     <ul className="list-disc ml-6 mt-1">
-                      {aiSuggestion.medications.map((med: any, index: number) => (
+{aiSuggestion.medications.map((med, index) => (
                         <li key={index}>
                           {med.name} - {med.dosage} ({med.instructions})
                         </li>
