@@ -2,28 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/utils/db';
 import { Patient } from '@/models/Patient';
 
-export const GET = async (
-  req: Request,
-  context: { params: { id: string } }
-): Promise<Response> => {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  await connectToDatabase();
+
+  const { id } = params;
+
   try {
-    await connectToDatabase();
-
-    const patient = await Patient.findById(context.params.id);
-
+    const patient = await Patient.findById(id);
     if (!patient) {
       return NextResponse.json({ message: 'Patient not found' }, { status: 404 });
     }
 
-    return NextResponse.json(patient, { status: 200 });
-
+    return NextResponse.json(patient);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Fetch patient error:', message);
-
-    return NextResponse.json(
-      { message: 'Failed to fetch patient', details: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Error fetching patient', error }, { status: 500 });
   }
-};
+}
