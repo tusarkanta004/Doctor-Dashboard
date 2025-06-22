@@ -2,17 +2,14 @@ import { Patient } from '@/models/Patient';
 import { connectToDatabase } from '@/utils/db';
 import { NextResponse } from 'next/server';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
-export const GET = async (req: Request, { params }: Params): Promise<Response> => {
+export const GET = async (
+  req: Request,
+  context: { params: { id: string } }
+): Promise<Response> => {
   try {
     await connectToDatabase();
 
-    const patient = await Patient.findById(params.id);
+    const patient = await Patient.findById(context.params.id);
 
     if (!patient) {
       return NextResponse.json({ message: 'Patient not found' }, { status: 404 });
