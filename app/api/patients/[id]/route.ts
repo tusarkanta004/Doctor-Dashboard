@@ -4,11 +4,11 @@ import { Patient } from '@/models/Patient';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   await connectToDatabase();
 
-  const { id } = context.params;
+  const { id } = params; // Destructure directly from params
 
   try {
     const patient = await Patient.findById(id);
