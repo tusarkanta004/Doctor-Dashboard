@@ -11,10 +11,10 @@ interface Patient {
   gender: string;
   email?: string;
   phone?: string;
-  diagnosis: any;
-  vitalSigns: any;
-  medicalHistory: any;
-  medications: any;
+  diagnosis: string;
+  vitalSigns: Record<string, string | number>;
+  medicalHistory: string[];
+  medications: { name: string; dosage: string; instructions: string }[];
   allergies: string[];
 }
 
@@ -23,26 +23,48 @@ export default function PatientDetailsPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+  interface AISuggestion {
+  symptoms: string;
+  diagnosis: string;
+  medications: { name: string; dosage: string; instructions: string }[];
+}
+const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
+
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [previousPrescriptions, setPreviousPrescriptions] = useState<any[]>([]);
+  interface Prescription {
+  _id: string;
+  doctorId: {
+    fullName: string;
+    specializations: string[];
+  };
+  createdAt: string;
+  symptoms: string[];
+  diagnosis: string;
+  medications: {
+    name: string;
+    dosage: string;
+    instructions: string;
+  }[];
+}
+const [previousPrescriptions, setPreviousPrescriptions] = useState<Prescription[]>([]);
+
 
   useEffect(() => {
-    const fetchData = async () => {
-      console.log("👤 Patient object:", patient);
-      const patientRes = await fetch(`/api/patients/${id}`);
-      const patientData = await patientRes.json();
-      setPatient(patientData);
+  const fetchData = async () => {
+    const patientRes = await fetch(`/api/patients/${id}`);
+    const patientData = await patientRes.json();
+    setPatient(patientData);
 
-      const prescriptionsRes = await fetch(`/api/prescriptions/${id}`);
-      const prescriptionsData = await prescriptionsRes.json();
-      if (Array.isArray(prescriptionsData)) {
-        setPreviousPrescriptions(prescriptionsData);
-      }
-    };
-    fetchData();
-  }, [id]);
+    const prescriptionsRes = await fetch(`/api/prescriptions/${id}`);
+    const prescriptionsData = await prescriptionsRes.json();
+    if (Array.isArray(prescriptionsData)) {
+      setPreviousPrescriptions(prescriptionsData);
+    }
+  };
+  fetchData();
+}, [id]);
+
 
   const handleGenerateSuggestion = async () => {
     console.log("💡 Generate AI Suggestion button clicked");

@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/utils/db';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
-export const GET = async (req: Request) => {
+export const GET = async (req: Request): Promise<Response> => {
   try {
     await connectToDatabase();
 
@@ -14,7 +14,6 @@ export const GET = async (req: Request) => {
       return NextResponse.json({ error: 'Doctor ID is required' }, { status: 400 });
     }
 
-    // Validate doctorId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(doctorId)) {
       return NextResponse.json({ error: 'Invalid Doctor ID format' }, { status: 400 });
     }
@@ -22,8 +21,13 @@ export const GET = async (req: Request) => {
     const patients = await Patient.find({ doctor: doctorId });
 
     return NextResponse.json(patients, { status: 200 });
-  } catch (err: any) {
-    console.error("❌ Error fetching patients:", err.message);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error("❌ Error fetching patients:", message);
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: message },
+      { status: 500 }
+    );
   }
 };
