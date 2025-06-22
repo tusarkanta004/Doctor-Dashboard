@@ -11,26 +11,49 @@ interface Patient {
   gender: string;
   email?: string;
   phone?: string;
-  diagnosis: any;
-  vitalSigns: any;
-  medicalHistory: any;
-  medications: any;
+  diagnosis: string;
+  vitalSigns: Record<string, string | number>;
+  medicalHistory: string[];
+  medications: { name: string; dosage: string; instructions: string }[];
   allergies: string[];
 }
 
+interface AISuggestion {
+  symptoms: string;
+  diagnosis: string;
+  medications: { name: string; dosage: string; instructions: string }[];
+}
+
+interface Prescription {
+  _id: string;
+  doctorId: {
+    fullName: string;
+    specializations: string[];
+  };
+  createdAt: string;
+  symptoms: string[];
+  diagnosis: string;
+  medications: {
+    name: string;
+    dosage: string;
+    instructions: string;
+  }[];
+}
+
 export default function PatientDetailsPage() {
-  const { id } = useParams();
+  const params = useParams();
   const { data: session } = useSession();
   const router = useRouter();
+  const id = typeof params.id === 'string' ? params.id : params.id?.[0] || '';
+
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [previousPrescriptions, setPreviousPrescriptions] = useState<any[]>([]);
+  const [previousPrescriptions, setPreviousPrescriptions] = useState<Prescription[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("👤 Patient object:", patient);
       const patientRes = await fetch(`/api/patients/${id}`);
       const patientData = await patientRes.json();
       setPatient(patientData);
@@ -41,17 +64,11 @@ export default function PatientDetailsPage() {
         setPreviousPrescriptions(prescriptionsData);
       }
     };
-    fetchData();
+    if (id) fetchData();
   }, [id]);
 
   const handleGenerateSuggestion = async () => {
-    console.log("💡 Generate AI Suggestion button clicked");
-
-    if (!patient) {
-      console.warn("No patient loaded yet");
-      return;
-    }
-
+    if (!patient) return;
     setLoadingSuggestion(true);
 
     try {
@@ -61,47 +78,46 @@ export default function PatientDetailsPage() {
         body: JSON.stringify({ patientData: patient })
       });
 
-      console.log("Response status:", res.status);
-
       const data = await res.json();
-      console.log("📦 AI Suggestion response:", data);
-
       if (data.suggestion) {
         setAiSuggestion(JSON.parse(data.suggestion));
-      } else {
-        console.warn("No suggestion found in response");
       }
-
     } catch (err) {
-      console.error("❌ Error fetching AI suggestion:", err);
+      console.error("❌ AI Suggestion Error:", err);
     } finally {
       setLoadingSuggestion(false);
     }
   };
 
-
   const handleSubmitPrescription = async () => {
     if (!patient || !aiSuggestion || !session?.user?.id) return;
     setSubmitting(true);
-    const res = await fetch('/api/prescriptions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        patientId: patient._id,
-        doctorId: session.user.id,
-        symptoms: aiSuggestion.symptoms.split(',').map((s: string) => s.trim()),
-        diagnosis: aiSuggestion.diagnosis,
-        medications: aiSuggestion.medications
-      })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert('✅ Prescription saved!');
-      router.push('/dashboard');
-    } else {
-      alert(`❌ Error: ${data.message}`);
+
+    try {
+      const res = await fetch('/api/prescriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientId: patient._id,
+          doctorId: session.user.id,
+          symptoms: aiSuggestion.symptoms.split(',').map((s) => s.trim()),
+          diagnosis: aiSuggestion.diagnosis,
+          medications: aiSuggestion.medications
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Prescription saved!');
+        router.push('/dashboard');
+      } else {
+        alert(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Prescription submission error:', error);
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   if (!patient) return <p className="p-5">Loading patient details...</p>;
@@ -158,14 +174,13 @@ export default function PatientDetailsPage() {
       {previousPrescriptions.length > 0 && (
         <div className="mt-10">
           <h2 className="text-2xl font-bold mb-4">📜 Previous Prescriptions</h2>
-
           {previousPrescriptions.map((prescription) => (
             <div
               key={prescription._id}
               className="mb-5 p-3 bg-slate-50 rounded border border-slate-200"
             >
               <p className="text-sm text-slate-600 mb-1">
-                <strong>By:</strong> {prescription.doctorId.fullName} ({prescription.doctorId.specializations.join(', ')})
+                <strong>By:</strong> {prescription.doctorId.fullName} ({prescription.doctorId.specializations?.join(', ')})
               </p>
               <p className="text-sm text-slate-600 mb-2">
                 <strong>Date:</strong> {new Date(prescription.createdAt).toLocaleString()}
@@ -179,7 +194,7 @@ export default function PatientDetailsPage() {
               <div className="mb-2">
                 <strong>Medications:</strong>
                 <ul className="list-disc ml-6">
-                  {prescription.medications.map((med: any, index: number) => (
+                  {prescription.medications.map((med, index) => (
                     <li key={index}>
                       {med.name} - {med.dosage} ({med.instructions})
                     </li>

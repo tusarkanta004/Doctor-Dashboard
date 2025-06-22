@@ -2,20 +2,55 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { IPatient } from '@/models/Patient';
+
+interface IDoctor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  gender?: string;
+  dateOfBirth?: string;
+  specializations?: string[];
+  bio?: string;
+  experience?: number;
+  licenseNumber: string;
+  medicalSchool?: string;
+  graduationYear?: number;
+  clinicName?: string;
+  practiceAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  consultationFee?: number;
+  medicalLicenseDocument?: string;
+}
+
+interface IMedication {
+  name: string;
+  dosage: string;
+  instructions: string;
+}
+
+interface IAiSuggestion {
+  symptoms: string;
+  diagnosis: string;
+  medications: IMedication[];
+}
 
 export default function Dashboard() {
   const router = useRouter();
-  const [doctor, setDoctor] = useState<any>(null);
+  const [doctor, setDoctor] = useState<IDoctor | null>(null);
   const [patients, setPatients] = useState<IPatient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<IPatient | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<any>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<IAiSuggestion | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
-
 
   // Prescription form state
   const [condition, setCondition] = useState('');
@@ -97,8 +132,14 @@ export default function Dashboard() {
       console.log("📦 AI Suggestion response:", data);
 
       if (data.suggestion) {
-        setAiSuggestion(JSON.parse(data.suggestion));
-      } else {
+  const parsedSuggestion =
+    typeof data.suggestion === 'string'
+      ? JSON.parse(data.suggestion)
+      : data.suggestion;
+
+  setAiSuggestion(parsedSuggestion);
+}
+ else {
         alert("No AI suggestion received.");
       }
 
@@ -116,9 +157,11 @@ export default function Dashboard() {
       {/* Header */}
       <div className="bg-white mb-6 p-5 rounded-2xl flex justify-between items-center shadow relative">
         <div className="flex items-center gap-4">
-          <img
+          <Image
             src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png"
             alt="Doctor Logo"
+            width={48}
+            height={48}
             className="h-12 w-12 rounded-xl"
           />
           <h1 className="text-xl font-bold text-blue-900">Doctor Dashboard</h1>
@@ -393,7 +436,7 @@ export default function Dashboard() {
                   <div>
                     <strong>Medications:</strong>
                     <ul className="list-disc ml-6 mt-1">
-                      {aiSuggestion.medications.map((med: any, index: number) => (
+{aiSuggestion.medications.map((med, index) => (
                         <li key={index}>
                           {med.name} - {med.dosage} ({med.instructions})
                         </li>
